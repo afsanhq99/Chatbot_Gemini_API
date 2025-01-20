@@ -1,7 +1,7 @@
 'use client';
 import Navbar from '../components/Navbar';
 import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useRouter } from 'next/navigation';
 
@@ -15,6 +15,16 @@ export default function Login() {
         e.preventDefault();
         try {
             await signInWithEmailAndPassword(auth, email, password);
+            router.push('/'); // Redirect to home page after login
+        } catch (error) {
+            setError(error.message);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            await signInWithPopup(auth, provider);
             router.push('/'); // Redirect to home page after login
         } catch (error) {
             setError(error.message);
@@ -56,9 +66,22 @@ export default function Login() {
                             Login
                         </button>
                     </form>
+                    <div className="mt-4">
+                        <button
+                            onClick={handleGoogleSignIn}
+                            className="w-full flex items-center justify-center bg-red-500 text-white py-2 rounded hover:bg-red-600"
+                        >
+                            <img
+                                src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                                alt="Google Logo"
+                                className="w-5 h-5 mr-2"
+                            />
+                            Sign in with Google
+                        </button>
+                    </div>
                     <p className="mt-4 text-center text-black">
                         Don't have an account?{' '}
-                        <a href="/signup" className="text-black-500 hover:underline">
+                        <a href="/signup" className="text-blue-500 hover:underline">
                             Sign Up
                         </a>
                     </p>
