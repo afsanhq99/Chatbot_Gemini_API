@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import Navbar from '../components/Navbar';
 import { useState } from 'react';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
@@ -71,10 +72,12 @@ export default function Login() {
                             onClick={handleGoogleSignIn}
                             className="w-full flex items-center justify-center bg-red-500 text-white py-2 rounded hover:bg-red-600"
                         >
-                            <img
-                                src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                            <Image
+                                src="/gmail.png"
                                 alt="Google Logo"
                                 className="w-5 h-5 mr-2"
+                                width={500}
+                                height={500}
                             />
                             Sign in with Google
                         </button>
