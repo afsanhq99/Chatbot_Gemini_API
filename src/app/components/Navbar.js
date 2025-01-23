@@ -14,18 +14,26 @@ export default function Navbar({ user }) {
     };
 
     return (
-        <nav className="bg-white shadow-md">
+        <nav className="bg-gradient-to-r from-blue-400 to-blue-700 shadow-lg">
             <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                <Link href="/" className="text-xl font-bold text-blue-600">
+                {/* App Logo */}
+                <Link href="/" className="text-xl font-bold text-white hover:text-blue-100 transition-colors duration-200">
                     Chat App
                 </Link>
-                <div className="flex items-center space-x-4">
+
+                {/* User Info and Logout Button */}
+                <div className="flex items-center space-x-6">
                     {user && (
                         <>
-                            <span className="text-gray-700">Welcome, {user.email}</span>
+                            {/* Welcome Message */}
+                            <span className="text-white text-sm font-large hidden sm:block transform transition-all duration-300 hover:scale-105">
+                                Welcome, <span className="font-semibold text-blue-100 hover:text-blue-50 transition-colors duration-200">{user.email}</span>
+                            </span>
+
+                            {/* Logout Button */}
                             <button
                                 onClick={handleLogout}
-                                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
+                                className="bg-white text-blue-600 hover:bg-blue-50 font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
                             >
                                 Logout
                             </button>
