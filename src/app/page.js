@@ -15,24 +15,22 @@ const getChatHistoryKey = (uid) => `gemini_chat_history_${uid}`;
 export default function Home() {
   const [chatHistory, setChatHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true); // New state for page loading
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  // Check if user is authenticated
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
-        setIsPageLoading(false); // Page is no longer loading
+        setIsPageLoading(false);
       } else {
-        router.push('/login'); // Redirect to login if not authenticated
+        router.push('/login');
       }
     });
     return () => unsubscribe();
   }, [router]);
 
-  // Load chat history from localStorage
   useEffect(() => {
     if (user) {
       try {
@@ -40,12 +38,12 @@ export default function Home() {
         if (storedHistory) {
           setChatHistory(JSON.parse(storedHistory));
         } else {
-          setChatHistory([]); // Initialize with empty array if no history exists
+          setChatHistory([]);
         }
       } catch (error) {
         console.error('Error loading chat history from local storage:', error);
       } finally {
-        setIsPageLoading(false); // Page is no longer loading
+        setIsPageLoading(false);
       }
     }
   }, [user]);
@@ -108,7 +106,6 @@ export default function Home() {
     generateChatPDF(chatHistory, user.uid);
   };
 
-  // Show loader while the page is loading
   if (isPageLoading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -118,45 +115,49 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-200 to-white min-h-screen animate-gradient">
+    <div className="bg-white min-h-screen"> {/*  White background for Gemini-like feel */}
       <Navbar user={user} />
-      <div className="container mx-auto p-6 max-w-4xl">
-        {/* Welcome Message */}
-        <div className="bg-white rounded-xl shadow-xl p-8 mb-8 text-center transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-          <h1 className="text-4xl font-extrabold text-blue-900 mb-4 font-sans">
-            Welcome, <span className="text-blue-600">{user.displayName || 'User'}</span>!
-          </h1>
-          <p className="text-lg text-gray-700 font-medium font-serif">
-            Start chatting with the AI assistant. Ask anything you'd like!
-          </p>
-        </div>
+      {/* Increased max-w-5xl for wider container */}
+      <div className="container mx-auto p-6 max-w-5xl">
 
-        {/* Buttons */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <button
-              onClick={handleSavePDF}
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
-            >
-              Save PDF
-            </button>
-            <button
-              onClick={handleClearChat}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md ml-2 transition-all duration-200 transform hover:scale-105"
-            >
-              Clear Chat
-            </button>
-          </div>
-        </div>
+        {/* Replace Welcome Message with a simple header */}
+        <header className="py-4 text-center">
+          <h1 className="text-2xl font-semibold text-gray-800">Chat app</h1>
+          <p className="text-gray-500">Powered by Firebase, Next.js and Google Gemini</p>
+        </header>
+
+        {/* Move Buttons to the bottom next to chat input */}
+
 
         {/* Chat History */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        {/* Use a neutral background, remove shadow */}
+        <div className="rounded-lg p-4 mb-2 border border-gray-200 min-h-96"> {/* Neutral background, subtle border */}
           <ChatHistory chatHistory={chatHistory} isLoading={isLoading} />
         </div>
 
-        {/* Chat Input */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+        {/* Chat Input & Buttons */}
+        <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
+
+          {/* Chat Input */}
+          <div className="flex-grow">
+            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+          </div>
+          <div className="flex items-center justify-center">
+            <div>
+              <button
+                onClick={handleSavePDF}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
+              >
+                Save PDF
+              </button>
+              <button
+                onClick={handleClearChat}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md ml-2 transition-all duration-200 transform hover:scale-105"
+              >
+                Clear Chat
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

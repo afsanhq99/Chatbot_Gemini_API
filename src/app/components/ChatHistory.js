@@ -13,7 +13,7 @@ export default function ChatHistory({ chatHistory, isLoading }) {
     useEffect(scrollToBottom, [chatHistory]);
 
     return (
-        <div className="border rounded-lg h-[60vh] overflow-y-auto mb-4 p-4 bg-gray-50">
+        <div className="border rounded-lg h-[80vh] overflow-y-auto mb-4 p-4 bg-gray-50">
             {chatHistory.map((message, index) => (
                 <div key={index} className="animate-fade-in">
                     <ChatMessage message={message} />
