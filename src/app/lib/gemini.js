@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY; // Make sure this is in .env.local
 
 const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 const CHAT_HISTORY_KEY = 'gemini_chat_history';
 

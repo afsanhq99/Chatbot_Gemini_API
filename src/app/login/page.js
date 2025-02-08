@@ -1,4 +1,5 @@
 'use client';
+
 import Image from 'next/image';
 import Navbar from '../components/Navbar';
 import { useState } from 'react';
@@ -41,12 +42,12 @@ export default function Login() {
                     {error && <p className="text-red-500 mb-4">{error}</p>}
                     <form onSubmit={handleLogin}>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium mb-2 text-black">Email</label>
+                            <label className="block text-sm font-medium mb-2 text-black bg-white">Email</label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full p-2 border rounded text-black"
+                                className="w-full p-2 border rounded text-black bg-white" // Added bg-white here
                                 required
                             />
                         </div>
@@ -56,7 +57,7 @@ export default function Login() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-2 border rounded text-black"
+                                className="w-full p-2 border rounded text-black bg-white" // Added bg-white here
                                 required
                             />
                         </div>

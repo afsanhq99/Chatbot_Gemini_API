@@ -35,7 +35,7 @@ export default function Signup() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full p-2 border rounded text-black"
+                                className="w-full p-2 border rounded text-black bg-white" // added bg-white
                                 required
                             />
                         </div>
@@ -45,7 +45,7 @@ export default function Signup() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-2 border rounded text-black"
+                                className="w-full p-2 border rounded text-black bg-white" // added bg-white
                                 required
                             />
                         </div>

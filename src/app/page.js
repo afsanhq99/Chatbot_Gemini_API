@@ -126,6 +126,23 @@ export default function Home() {
     );
   }
 
+  let welcomeMessage = null;
+  if (chatHistory.length === 0) {
+    welcomeMessage = (
+      <div className="text-center p-6 rounded-lg bg-gray-100 dark:bg-gray-700">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Welcome!</h2>
+        <p className="text-gray-600 dark:text-gray-400">Start chatting and explore the possibilities.</p>
+      </div>
+    );
+  } else {
+    welcomeMessage = (
+      <div className="text-center p-6 rounded-lg bg-gray-100 dark:bg-gray-700">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Welcome Back!</h2>
+        <p className="text-gray-600 dark:text-gray-400">Continue your conversation.</p>
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen ${currentTheme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
       <Navbar user={user} />
@@ -142,8 +159,12 @@ export default function Home() {
 
         {/* Chat History */}
         {/* Use a neutral background, remove shadow */}
-        <div className={`rounded-lg p-4 mb-2 border ${currentTheme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} min-h-96`}> {/* Neutral background, subtle border */}
-          <ChatHistory chatHistory={chatHistory} isLoading={isLoading} />
+        <div className={`rounded-lg p-4 mb-2 border ${currentTheme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} min-h-96`}>
+          {chatHistory.length === 0 ? (
+            welcomeMessage
+          ) : (
+            <ChatHistory chatHistory={chatHistory} isLoading={isLoading} />
+          )}
         </div>
 
         {/* Chat Input & Buttons */}

@@ -3,12 +3,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';  // Re-introduce
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+    const { theme } = useTheme(); // Use the theme
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,7 +42,7 @@ const Login = () => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className={`w-full p-2 border border-gray-300 rounded bg-white ${theme === 'dark' ? 'bg-gray-700 text-white' : ''}`}  // TEMPORARY: Add conditional
                         required
                     />
                 </div>
@@ -50,7 +52,7 @@ const Login = () => {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className={`w-full p-2 border border-gray-300 rounded bg-white ${theme === 'dark' ? 'bg-gray-700 text-white' : ''}`}  // TEMPORARY: Add conditional
                         required
                     />
                 </div>

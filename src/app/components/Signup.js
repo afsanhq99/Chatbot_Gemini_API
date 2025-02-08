@@ -39,7 +39,7 @@ const Signup = () => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2 border border-gray-300 rounded bg-white !important"
                         required
                     />
                 </div>
@@ -49,7 +49,7 @@ const Signup = () => {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2 border border-gray-300 rounded bg-white !important"
                         required
                     />
                 </div>
