@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import Navbar from './components/Navbar';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { useTheme } from 'next-themes'; // Import useTheme from next-themes
+import { MoonIcon, SunIcon } from '@heroicons/react/24/solid'; // Import icons
 
 const getChatHistoryKey = (uid) => `gemini_chat_history_${uid}`;
 
@@ -18,6 +20,16 @@ export default function Home() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [user, setUser] = useState(null);
   const router = useRouter();
+  const { theme, setTheme, systemTheme } = useTheme(); // Use the useTheme hook
+
+  // Initial state for the theme, handle undefined during SSR
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const currentTheme = mounted ? (theme === 'system' ? systemTheme : theme) : "light"; // Default to light during SSR.  Could also check for cookies here.
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -108,30 +120,29 @@ export default function Home() {
 
   if (isPageLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 dark:bg-white dark:bg-opacity-50">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white min-h-screen"> {/*  White background for Gemini-like feel */}
+    <div className={`min-h-screen ${currentTheme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
       <Navbar user={user} />
       {/* Increased max-w-5xl for wider container */}
       <div className="container mx-auto p-6 max-w-5xl">
 
         {/* Replace Welcome Message with a simple header */}
         <header className="py-4 text-center">
-          <h1 className="text-2xl font-semibold text-gray-800">Chat app</h1>
-          <p className="text-gray-500">Powered by Firebase, Next.js and Google Gemini</p>
+          <h1 className="text-2xl font-semibold">Chat app</h1>
+          <p className="text-gray-500 dark:text-gray-400">Powered by Firebase, Next.js and Google Gemini</p>
         </header>
 
         {/* Move Buttons to the bottom next to chat input */}
 
-
         {/* Chat History */}
         {/* Use a neutral background, remove shadow */}
-        <div className="rounded-lg p-4 mb-2 border border-gray-200 min-h-96"> {/* Neutral background, subtle border */}
+        <div className={`rounded-lg p-4 mb-2 border ${currentTheme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} min-h-96`}> {/* Neutral background, subtle border */}
           <ChatHistory chatHistory={chatHistory} isLoading={isLoading} />
         </div>
 
@@ -155,6 +166,13 @@ export default function Home() {
                 className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md ml-2 transition-all duration-200 transform hover:scale-105"
               >
                 Clear Chat
+              </button>
+              {/* Dark mode toggle button */}
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-2 px-4 rounded-lg shadow-md ml-2 transition-all duration-200 transform hover:scale-105"
+              >
+                {currentTheme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
               </button>
             </div>
           </div>

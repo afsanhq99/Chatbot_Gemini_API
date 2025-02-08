@@ -1,10 +1,13 @@
+'use client';
+
 import { useState } from 'react';
 import MessageContent from './MessageContent';
+import { useTheme } from 'next-themes'; // Import useTheme
 
 export default function ChatMessage({ message }) {
     const [isCopied, setIsCopied] = useState(false);
+    const { theme } = useTheme(); // Use the useTheme hook
 
-    // Function to copy the message content to the clipboard
     const handleCopy = () => {
         // Extract the text from message parts
         const messageText = message.parts.map(part => part.text).join('\n');
@@ -31,11 +34,11 @@ export default function ChatMessage({ message }) {
 
     return (
         <div className={`mb-3 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <div className={`inline-block px-4 py-3 rounded-lg relative ${message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+            <div className={`inline-block px-4 py-3 rounded-lg relative ${message.role === 'user' ? 'bg-blue-500 text-white' : (theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-800')}`}>
                 {/* Copy button */}
                 <button
                     onClick={handleCopy}
-                    className={`absolute -top-2 -right-2 p-1 rounded-full text-sm ${message.role === 'user' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 hover:bg-gray-400'}`}
+                    className={`absolute -top-2 -right-2 p-1 rounded-full text-sm ${message.role === 'user' ? 'bg-blue-600 hover:bg-blue-700' : (theme === 'dark' ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400')}`}
                     title="Copy to clipboard"
                 >
                     {isCopied ? (

@@ -2,6 +2,7 @@
 import './globals.css';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation'
+import { ThemeProvider } from "next-themes";
 
 export const metadata = {
   title: 'Chat App',
@@ -13,10 +14,14 @@ export default async function RootLayout({ children }) {
 
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
+        <ThemeProvider attribute="class">
+          {children}
 
-        {children}
+        </ThemeProvider>
+
+
 
       </body>
     </html>
