@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import ChatInput from './components/ChatInput';
 import ChatHistory from './components/ChatHistory';
-import { sendMessage, clearChatHistory } from './lib/gemini';
+import { sendMessage } from './lib/gemini';
 import { generateChatPDF } from './lib/pdfUtils';
 import { useRouter } from 'next/navigation';
 import Navbar from './components/Navbar';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useTheme } from 'next-themes'; // Import useTheme from next-themes
-import { MoonIcon, SunIcon } from '@heroicons/react/24/solid'; // Import icons
+import { useTheme } from 'next-themes';
+import { MoonIcon, SunIcon } from '@heroicons/react/24/solid';
 
 const getChatHistoryKey = (uid) => `gemini_chat_history_${uid}`;
 
@@ -20,16 +20,11 @@ export default function Home() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [user, setUser] = useState(null);
   const router = useRouter();
-  const { theme, setTheme, systemTheme } = useTheme(); // Use the useTheme hook
-
-  // Initial state for the theme, handle undefined during SSR
+  const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const currentTheme = mounted ? (theme === 'system' ? systemTheme : theme) : "light"; // Default to light during SSR.  Could also check for cookies here.
+  useEffect(() => setMounted(true), []);
+  const currentTheme = mounted ? (theme === 'system' ? systemTheme : theme) : 'light';
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -47,13 +42,9 @@ export default function Home() {
     if (user) {
       try {
         const storedHistory = localStorage.getItem(getChatHistoryKey(user.uid));
-        if (storedHistory) {
-          setChatHistory(JSON.parse(storedHistory));
-        } else {
-          setChatHistory([]);
-        }
+        setChatHistory(storedHistory ? JSON.parse(storedHistory) : []);
       } catch (error) {
-        console.error('Error loading chat history from local storage:', error);
+        console.error('Error loading chat history:', error);
       } finally {
         setIsPageLoading(false);
       }
@@ -64,45 +55,33 @@ export default function Home() {
     try {
       localStorage.setItem(getChatHistoryKey(uid), JSON.stringify(history));
     } catch (error) {
-      console.error('Error saving chat history to local storage:', error);
+      console.error('Error saving chat history:', error);
     }
   };
 
   const handleSendMessage = async (input) => {
     setIsLoading(true);
-
-    const newUserMessage = {
-      role: 'user',
-      parts: [{ text: input }],
-    };
-
-    setChatHistory((prevHistory) => {
-      const updatedHistory = [...prevHistory, newUserMessage];
-      saveChatHistory(updatedHistory, user.uid);
-      return updatedHistory;
+    const newUserMessage = { role: 'user', parts: [{ text: input }] };
+    setChatHistory((prev) => {
+      const updated = [...prev, newUserMessage];
+      saveChatHistory(updated, user.uid);
+      return updated;
     });
 
     try {
       const response = await sendMessage(input, chatHistory);
-      const newModelMessage = {
-        role: 'model',
-        parts: [{ text: response }],
-      };
-      setChatHistory((prevHistory) => {
-        const updatedHistory = [...prevHistory, newModelMessage];
-        saveChatHistory(updatedHistory, user.uid);
-        return updatedHistory;
+      const newModelMessage = { role: 'model', parts: [{ text: response }] };
+      setChatHistory((prev) => {
+        const updated = [...prev, newModelMessage];
+        saveChatHistory(updated, user.uid);
+        return updated;
       });
     } catch (error) {
       console.error('Error:', error);
-      const errorModelMessage = {
-        role: 'model',
-        parts: [{ text: 'An error occurred.' }],
-      };
-      setChatHistory((prevHistory) => {
-        const updatedHistory = [...prevHistory, errorModelMessage];
-        saveChatHistory(updatedHistory, user.uid);
-        return updatedHistory;
+      setChatHistory((prev) => {
+        const updated = [...prev, { role: 'model', parts: [{ text: 'An error occurred.' }] }];
+        saveChatHistory(updated, user.uid);
+        return updated;
       });
     } finally {
       setIsLoading(false);
@@ -114,88 +93,84 @@ export default function Home() {
     localStorage.removeItem(getChatHistoryKey(user.uid));
   };
 
-  const handleSavePDF = () => {
-    generateChatPDF(chatHistory, user.uid);
-  };
+  const handleSavePDF = () => generateChatPDF(chatHistory, user.uid);
 
   if (isPageLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 dark:bg-white dark:bg-opacity-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  let welcomeMessage = null;
-  if (chatHistory.length === 0) {
-    welcomeMessage = (
-      <div className="text-center p-6 rounded-lg bg-gray-100 dark:bg-gray-700">
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Welcome!</h2>
-        <p className="text-gray-600 dark:text-gray-400">Start chatting and explore the possibilities.</p>
-      </div>
-    );
-  } else {
-    welcomeMessage = (
-      <div className="text-center p-6 rounded-lg bg-gray-100 dark:bg-gray-700">
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Welcome Back!</h2>
-        <p className="text-gray-600 dark:text-gray-400">Continue your conversation.</p>
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${currentTheme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
+    <div className={`min-h-screen ${currentTheme === 'dark' ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-white' : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900'} transition-colors duration-300 font-poppins`}>
       <Navbar user={user} />
-      {/* Increased max-w-5xl for wider container */}
-      <div className="container mx-auto p-6 max-w-5xl">
-
-        {/* Replace Welcome Message with a simple header */}
-        <header className="py-4 text-center">
-          <h1 className="text-2xl font-semibold">Chat app</h1>
-          <p className="text-gray-500 dark:text-gray-400">Powered by Firebase, Next.js and Google Gemini</p>
+      <div className="container mx-auto p-6 max-w-6xl">
+        {/* Header */}
+        <header className="py-6 text-center">
+          <h1 className="text-5xl font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+            ChatSphere
+          </h1>
+          <p className="mt-2 text-base font-medium text-gray-500 dark:text-gray-400">
+            Powered by Firebase, Next.js, and Google Gemini
+          </p>
         </header>
 
-        {/* Move Buttons to the bottom next to chat input */}
-
-        {/* Chat History */}
-        {/* Use a neutral background, remove shadow */}
-        <div className={`rounded-lg p-4 mb-2 border ${currentTheme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} min-h-96`}>
+        {/* Chat Container */}
+        <div className={`rounded-xl p-6 shadow-lg ${currentTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border min-h-[60vh] mb-6`}>
           {chatHistory.length === 0 ? (
-            welcomeMessage
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
+              <h2 className="text-4xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500 animate-pulse">
+                Welcome to ChatSphere!
+              </h2>
+              <p className="text-lg font-light text-gray-600 dark:text-gray-300 max-w-md">
+                Dive into a world of conversation—ask anything, explore everything!
+              </p>
+              <div className="mt-4">
+                <span className="inline-block bg-gradient-to-r from-blue-400 to-purple-400 text-white py-2 px-4 rounded-full shadow-md">
+                  Start Chatting
+                </span>
+              </div>
+            </div>
           ) : (
             <ChatHistory chatHistory={chatHistory} isLoading={isLoading} />
           )}
         </div>
 
         {/* Chat Input & Buttons */}
-        <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
-
-          {/* Chat Input */}
-          <div className="flex-grow">
-            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="flex-grow w-full">
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              className={`w-full p-4 rounded-full shadow-md border ${currentTheme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500'} focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300`}
+              placeholder="Type your message here..."
+            />
           </div>
-          <div className="flex items-center justify-center">
-            <div>
-              <button
-                onClick={handleSavePDF}
-                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
-              >
-                Save PDF
-              </button>
-              <button
-                onClick={handleClearChat}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md ml-2 transition-all duration-200 transform hover:scale-105"
-              >
-                Clear Chat
-              </button>
-              {/* Dark mode toggle button */}
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-2 px-4 rounded-lg shadow-md ml-2 transition-all duration-200 transform hover:scale-105"
-              >
-                {currentTheme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
-              </button>
-            </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleSavePDF}
+              className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold py-2 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+              Save as PDF
+            </button>
+            <button
+              onClick={handleClearChat}
+              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-semibold py-2 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400"
+            >
+              Clear Chat
+            </button>
+            <button
+              onClick={() => setTheme(currentTheme === 'dark' ? 'light' : 'dark')}
+              className="p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              {currentTheme === 'dark' ? (
+                <SunIcon className="h-6 w-6 text-yellow-400" />
+              ) : (
+                <MoonIcon className="h-6 w-6 text-gray-700" />
+              )}
+            </button>
           </div>
         </div>
       </div>
