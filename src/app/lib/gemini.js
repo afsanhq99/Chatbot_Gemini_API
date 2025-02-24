@@ -36,7 +36,7 @@ export const sendMessage = async (input, chatHistory) => {
         const chat = model.startChat({
             history: chatHistory,
             generationConfig: {
-                maxOutputTokens: 800,
+                maxOutputTokens: 1200,
             },
         });
         const result = await chat.sendMessage(input);
