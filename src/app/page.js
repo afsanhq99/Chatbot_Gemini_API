@@ -8,7 +8,6 @@ import { MoonIcon, SunIcon, SparklesIcon, ArrowPathIcon, DocumentArrowDownIcon }
 import ChatInput from './components/ChatInput';
 import ChatHistory from './components/ChatHistory';
 import Navbar from './components/Navbar';
-import { sendMessage } from './lib/gemini';
 import { generateChatPDF } from './lib/pdfUtils';
 import { auth } from './lib/firebase';
 
@@ -62,33 +61,89 @@ export default function Home() {
     }
   };
 
-  // Handle sending messages
+  // Handle sending messages with streaming
   const handleSendMessage = async (input) => {
+    if (!user) return; // Ensure user is logged in
+
     setIsLoading(true);
     const newUserMessage = { role: 'user', parts: [{ text: input }] };
-    setChatHistory((prev) => {
-      const updated = [...prev, newUserMessage];
-      saveChatHistory(updated, user.uid);
-      return updated;
-    });
+    const currentChatHistory = [...chatHistory, newUserMessage];
+
+    // Add user message immediately
+    setChatHistory(currentChatHistory);
+    saveChatHistory(currentChatHistory, user.uid); // Save user message
+
+    // Prepare a placeholder for the model's response
+    const modelMessagePlaceholder = { role: 'model', parts: [{ text: '' }] };
+    setChatHistory((prev) => [...prev, modelMessagePlaceholder]);
 
     try {
-      const response = await sendMessage(input, chatHistory);
-      const newModelMessage = { role: 'model', parts: [{ text: response }] };
-      setChatHistory((prev) => {
-        const updated = [...prev, newModelMessage];
-        saveChatHistory(updated, user.uid);
-        return updated;
+      const response = await fetch('/api/chat/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          input: input,
+          // Send only the history *before* the current user message and placeholder
+          chatHistory: chatHistory.filter(msg => msg !== newUserMessage && msg !== modelMessagePlaceholder)
+        }),
       });
-    } catch (error) {
-      console.error('Error:', error);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API request failed with status ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedResponse = '';
+
+      // Read the stream
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        accumulatedResponse += decoder.decode(value, { stream: true });
+
+        // Update the last message (model's response) in the chat history
+        setChatHistory((prev) => {
+          const updatedHistory = [...prev];
+          const lastMessageIndex = updatedHistory.length - 1;
+          if (lastMessageIndex >= 0 && updatedHistory[lastMessageIndex].role === 'model') {
+            updatedHistory[lastMessageIndex] = {
+              ...updatedHistory[lastMessageIndex],
+              parts: [{ text: accumulatedResponse }],
+            };
+          }
+          return updatedHistory;
+        });
+      }
+
+      // Final save after stream is complete
       setChatHistory((prev) => {
-        const updated = [
-          ...prev,
-          { role: 'model', parts: [{ text: 'An error occurred.' }] },
-        ];
-        saveChatHistory(updated, user.uid);
-        return updated;
+        saveChatHistory(prev, user.uid);
+        return prev;
+      });
+
+
+    } catch (error) {
+      console.error('Error calling streaming API:', error);
+      // Update the placeholder with an error message
+      setChatHistory((prev) => {
+        const updatedHistory = [...prev];
+        const lastMessageIndex = updatedHistory.length - 1;
+        if (lastMessageIndex >= 0 && updatedHistory[lastMessageIndex].role === 'model') {
+          updatedHistory[lastMessageIndex] = {
+            role: 'model',
+            parts: [{ text: `Error: ${error.message || 'An error occurred.'}` }],
+          };
+        } else {
+          // If placeholder wasn't added or history changed unexpectedly, add error as new message
+          updatedHistory.push({ role: 'model', parts: [{ text: `Error: ${error.message || 'An error occurred.'}` }] });
+        }
+        saveChatHistory(updatedHistory, user.uid); // Save history with error
+        return updatedHistory;
       });
     } finally {
       setIsLoading(false);
