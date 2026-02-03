@@ -36,6 +36,22 @@ body {
   animation: fade-in 0.5s ease-out;
 }
 
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out 0.35s ease-in;
+}
+
 @keyframes bounce {
 
   0%,
@@ -62,4 +78,38 @@ body {
 
 .delay-300 {
   animation-delay: 0.3s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-12px) scale(1.02);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-shimmer {
+  background-size: 200% 200%;
+  animation: shimmer 8s ease infinite;
 }

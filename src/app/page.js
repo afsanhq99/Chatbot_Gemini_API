@@ -295,15 +295,20 @@ export default function Home() {
         <Navbar user={user} />
 
         <div
-          className={`flex-1 flex flex-col overflow-y-auto ${currentTheme === 'dark'
+          className={`relative flex-1 flex flex-col overflow-y-auto ${currentTheme === 'dark'
             ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-indigo-950 text-white'
             : 'bg-gradient-to-br from-blue-50 via-gray-50 to-indigo-50 text-gray-900'
             } transition-colors duration-300 font-poppins`}
         >
-          <div className="container mx-auto p-4 md:p-6 max-w-5xl flex-grow flex flex-col">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -top-20 left-10 h-56 w-56 rounded-full bg-blue-500/20 blur-3xl animate-float"></div>
+            <div className="absolute top-20 right-10 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl animate-float"></div>
+            <div className="absolute bottom-10 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-indigo-500/20 blur-3xl animate-float"></div>
+          </div>
+          <div className="container mx-auto p-4 md:p-6 max-w-5xl flex-grow flex flex-col relative z-10">
             <header className="py-6 text-center">
               <div className="inline-block relative">
-                <h1 className="text-5xl md:text-6xl font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-500 to-indigo-600 pb-2">
+                <h1 className="text-5xl md:text-6xl font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-500 to-indigo-600 pb-2 animate-shimmer">
                   ChatSphere
                 </h1>
                 <div className="absolute -right-8 -top-3">
@@ -317,9 +322,9 @@ export default function Home() {
 
             <div className="flex-grow w-full mt-4 mb-6">
               <div
-                className={`rounded-2xl p-6 shadow-xl border min-h-[50vh] backdrop-blur-sm flex flex-col ${currentTheme === 'dark'
-                  ? 'bg-gray-800/70 border-gray-700 shadow-indigo-900/20'
-                  : 'bg-white/90 border-gray-200 shadow-blue-200/60'
+                className={`rounded-3xl p-6 shadow-2xl border min-h-[50vh] backdrop-blur-md flex flex-col ${currentTheme === 'dark'
+                  ? 'bg-gray-900/70 border-gray-700/60 shadow-indigo-900/30'
+                  : 'bg-white/80 border-gray-200 shadow-blue-200/60'
                   } transition-all duration-300 ease-in-out`}
               >
                 {chatHistory.length === 0 && !isLoading ? (
@@ -354,10 +359,10 @@ export default function Home() {
                     <ChatInput
                       onSendMessage={handleSendMessage}
                       isLoading={isLoading}
-                      className={`w-full p-4 rounded-full shadow-lg border ${currentTheme === 'dark'
-                        ? 'bg-gray-700/90 border-gray-600 text-white placeholder-gray-400'
-                        : 'bg-white/90 border-gray-200 text-gray-900 placeholder-gray-500'
-                        } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300`}
+                      className={`${currentTheme === 'dark'
+                        ? 'text-gray-100 placeholder:text-gray-400'
+                        : 'text-gray-800 placeholder:text-gray-500'
+                        }`}
                       placeholder="Type your message here..."
                     />
                   </div>
