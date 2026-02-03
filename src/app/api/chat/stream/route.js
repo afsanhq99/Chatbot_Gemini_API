@@ -1,13 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from 'next/server';
 
-// Initialize Google Generative AI
-const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-if (!API_KEY) {
-    throw new Error("Missing NEXT_PUBLIC_GEMINI_API_KEY environment variable");
-}
-const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); // Or your preferred model
+const getModel = () => {
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    if (!apiKey) {
+        return null;
+    }
+    const genAI = new GoogleGenerativeAI(apiKey);
+    return genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+};
 
 export async function POST(req) {
     try {
@@ -17,8 +18,13 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Input is required' }, { status: 400 });
         }
 
+        const model = getModel();
+        if (!model) {
+            return NextResponse.json({ error: 'Missing NEXT_PUBLIC_GEMINI_API_KEY environment variable' }, { status: 500 });
+        }
+
         const chat = model.startChat({
-            history: chatHistory || [], // Ensure history is an array
+            history: Array.isArray(chatHistory) ? chatHistory : [],
             generationConfig: {
                 // Adjust generation config as needed
                 // maxOutputTokens: 1200,
