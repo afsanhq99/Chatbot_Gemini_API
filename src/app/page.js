@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
-  getFirestore,
   collection,
   addDoc,
   query,
@@ -19,7 +18,7 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 import { useTheme } from 'next-themes';
-import { MoonIcon, SunIcon, SparklesIcon, ArrowPathIcon, DocumentArrowDownIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
+import { MoonIcon, SunIcon, SparklesIcon, DocumentArrowDownIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
 import ChatInput from './components/ChatInput';
 import ChatHistory from './components/ChatHistory';
 import Navbar from './components/Navbar';
