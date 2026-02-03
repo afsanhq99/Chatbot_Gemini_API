@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTheme } from 'next-themes'; // Import useTheme
 
-export default function ChatInput({ onSendMessage, isLoading }) {
+export default function ChatInput({ onSendMessage, isLoading, className = '', placeholder = 'Enter your message' }) {
     const [input, setInput] = useState('');
     const [isFocused, setIsFocused] = useState(false); // Track input focus
     const [isSending, setIsSending] = useState(false); // Track sending state
@@ -20,8 +20,8 @@ export default function ChatInput({ onSendMessage, isLoading }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-            <div className="flex">
+        <form onSubmit={handleSubmit} className="w-full">
+            <div className={`flex items-center gap-3 rounded-full p-2 ${theme === 'dark' ? 'bg-gray-800/80' : 'bg-white/80'} shadow-lg shadow-blue-500/10 backdrop-blur`}>
                 {/* Input Field */}
                 <input
                     type="text"
@@ -29,16 +29,16 @@ export default function ChatInput({ onSendMessage, isLoading }) {
                     onChange={(e) => setInput(e.target.value)}
                     onFocus={() => setIsFocused(true)} // Trigger fade-in effect
                     onBlur={() => setIsFocused(false)} // Reset focus state
-                    placeholder="Enter your message"
-                    className={`flex-grow rounded-l-lg px-4 py-3 focus:outline-none transition-all duration-300 ${theme === 'dark' ? 'bg-gray-700 text-gray-200 border-gray-700 focus:ring-blue-500 focus:border-blue-500' : 'bg-gray-100 text-gray-700 border-gray-100 focus:ring-blue-500 focus:border-blue-500'
-                        } ${isFocused ? 'animate-fade-in' : ''}`}
+                    placeholder={placeholder}
+                    className={`flex-grow bg-transparent px-4 py-3 focus:outline-none transition-all duration-300 text-sm md:text-base ${theme === 'dark' ? 'text-gray-100 placeholder:text-gray-400' : 'text-gray-700 placeholder:text-gray-500'
+                        } ${isFocused ? 'animate-fade-in' : ''} ${className}`}
                 />
 
                 {/* Send Button */}
                 <button
                     type="submit"
-                    className={`font-bold py-3 px-6 rounded-r-lg transition-all duration-200 transform ${isLoading ? 'cursor-not-allowed opacity-75' : 'hover:scale-105'
-                        } ${isSending ? 'animate-fade-out' : ''} ${theme === 'dark' ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'}`} // Apply fade-out effect when sending
+                    className={`font-semibold py-3 px-6 rounded-full transition-all duration-200 transform ${isLoading ? 'cursor-not-allowed opacity-75' : 'hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30'
+                        } ${isSending ? 'animate-fade-out' : ''} bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white`} // Apply fade-out effect when sending
                     disabled={isLoading}
                 >
                     Send

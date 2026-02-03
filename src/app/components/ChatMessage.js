@@ -49,30 +49,30 @@ export default function ChatMessage({ message }) {
 
     // Helper function to get Tailwind classes based on role and theme.  This improves readability.
     const getMessageClasses = () => {
-        const baseClasses = 'inline-block px-4 py-3 rounded-lg relative';
+        const baseClasses = 'inline-block px-5 py-3 rounded-2xl relative shadow-lg transition-all duration-300';
         if (message.role === 'user') {
-            return `${baseClasses} bg-blue-500 text-white`;
+            return `${baseClasses} bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 text-white shadow-indigo-500/30 hover:-translate-y-0.5`;
         } else {
             return theme === 'dark'
-                ? `${baseClasses} bg-gray-700 text-gray-300`
-                : `${baseClasses} bg-gray-200 text-gray-800`;
+                ? `${baseClasses} bg-gray-800/80 text-gray-200 border border-gray-700/70 shadow-black/20 hover:-translate-y-0.5`
+                : `${baseClasses} bg-white/90 text-gray-800 border border-gray-200 shadow-blue-500/10 hover:-translate-y-0.5`;
         }
     };
 
     const getCopyButtonClasses = () => {
-        const baseClasses = `absolute -top-2 -right-2 p-1 rounded-full text-sm`;
+        const baseClasses = `absolute -top-3 -right-3 p-1.5 rounded-full text-xs shadow-md transition-all duration-200`;
         if (message.role === 'user') {
-            return `${baseClasses} bg-blue-600 hover:bg-blue-700`;
+            return `${baseClasses} bg-white/20 text-white hover:bg-white/30`;
         } else {
             return theme === 'dark'
-                ? `${baseClasses} bg-gray-600 hover:bg-gray-500 text-white`
-                : `${baseClasses} bg-gray-300 hover:bg-gray-400`;
+                ? `${baseClasses} bg-gray-700 hover:bg-gray-600 text-white`
+                : `${baseClasses} bg-white hover:bg-gray-100 text-gray-700`;
         }
     };
 
     return (
         <div className={`mb-3 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <div className={getMessageClasses()}>
+            <div className={`${getMessageClasses()} animate-fade-in`}>
                 {/* Copy button */}
                 <button
                     onClick={handleCopy}

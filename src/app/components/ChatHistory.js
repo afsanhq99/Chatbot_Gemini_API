@@ -16,8 +16,7 @@ export default function ChatHistory({ chatHistory, isLoading }) {
 
     return (
         <div
-            className={`border rounded-lg h-[80vh] overflow-y-auto mb-4 p-4 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50'
-                }`}
+            className={`h-[80vh] overflow-y-auto mb-4 p-2 md:p-4 space-y-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}
         >
             {chatHistory.map((message, index) => (
                 <div key={index} className="animate-fade-in">
@@ -27,7 +26,7 @@ export default function ChatHistory({ chatHistory, isLoading }) {
             {isLoading && (
                 <div className="mb-2 text-left animate-fade-in">
                     <div
-                        className={`inline-block px-3 py-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full shadow-sm ${theme === 'dark' ? 'bg-gray-800/80 text-gray-300 border border-gray-700/60' : 'bg-white/90 text-gray-600 border border-gray-200'
                             }`}
                     >
                         <div className="flex items-center">
